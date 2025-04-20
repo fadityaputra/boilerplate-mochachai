@@ -61,7 +61,6 @@ const travellers = function (req, res) {
   res.json(data);
 };
 
-
 app.route('/travellers')
   .put(travellers);
 
@@ -81,7 +80,6 @@ app.get('/_api/get-tests', cors(), function (req, res, next) {
     });
   });
 
-
 const port = process.env.PORT || 3000;
 app.listen(port, function () {
   console.log("Listening on port " + port);
@@ -96,7 +94,6 @@ app.listen(port, function () {
     }
   }, 1500);
 });
-
 
 module.exports = app; // for testing
 

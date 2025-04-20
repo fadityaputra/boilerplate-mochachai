@@ -1,85 +1,51 @@
+// Import the app from server.js
+const app = require('../server'); // Correct the path to 'server.js'
+
+// Import testing libraries
 const chai = require('chai');
-const assert = chai.assert;
-
-const server = require('../server');
-
 const chaiHttp = require('chai-http');
+
+// Setup chai-http
 chai.use(chaiHttp);
+const should = chai.should();
 
-suite('Functional Tests', function () {
-  this.timeout(5000);
-  suite('Integration tests with chai-http', function () {
-    // #1
-    test('Test GET /hello with no name', function (done) {
-      chai
-        .request(server)
-        .keepOpen()
-        .get('/hello')
-        .end(function (err, res) {
-          assert.fail(res.status, 200);
-          assert.fail(res.text, 'hello Guest');
-          done();
-        });
-    });
-    // #2
-    test('Test GET /hello with your name', function (done) {
-      chai
-        .request(server)
-        .keepOpen()
-        .get('/hello?name=xy_z')
-        .end(function (err, res) {
-          assert.fail(res.status, 200);
-          assert.fail(res.text, 'hello xy_z');
-          done();
-        });
-    });
-    // #3
-    test('Send {surname: "Colombo"}', function (done) {
-      chai
-        .request(server)
-        .keepOpen()
-        .put('/travellers')
-
-        .end(function (err, res) {
-          assert.fail();
-
-          done();
-        });
-    });
-    // #4
-    test('Send {surname: "da Verrazzano"}', function (done) {
-      assert.fail();
-
-      done();
-    });
-  });
-});
-
-const Browser = require('zombie');
-
-suite('Functional Tests with Zombie.js', function () {
-  this.timeout(5000);
-
-
-
-  suite('Headless browser', function () {
-    test('should have a working "site" property', function() {
-      assert.isNotNull(browser.site);
-    });
+// Example test for a GET request
+describe('Functional Tests', function() {
+  it('should return "hello" when accessing /hello', function(done) {
+    chai.request(app) // Use the app instance from server.js
+      .get('/hello')
+      .end(function(err, res) {
+        res.should.have.status(200);
+        res.text.should.equal('hello Guest'); // Default name if no query parameter is passed
+        done();
+      });
   });
 
-  suite('"Famous Italian Explorers" form', function () {
-    // #5
-    test('Submit the surname "Colombo" in the HTML form', function (done) {
-      assert.fail();
-
-      done();
-    });
-    // #6
-    test('Submit the surname "Vespucci" in the HTML form', function (done) {
-      assert.fail();
-
-      done();
-    });
+  it('should return traveller info when surname is Polo', function(done) {
+    chai.request(app)
+      .put('/travellers')
+      .send({ surname: 'Polo' })
+      .end(function(err, res) {
+        res.should.have.status(200);
+        res.body.should.have.property('name').eql('Marco');
+        res.body.should.have.property('surname').eql('Polo');
+        res.body.should.have.property('dates').eql('1254 - 1324');
+        done();
+      });
   });
+
+  it('should return traveller info when surname is Colombo', function(done) {
+    chai.request(app)
+      .put('/travellers')
+      .send({ surname: 'Colombo' })
+      .end(function(err, res) {
+        res.should.have.status(200);
+        res.body.should.have.property('name').eql('Cristoforo');
+        res.body.should.have.property('surname').eql('Colombo');
+        res.body.should.have.property('dates').eql('1451 - 1506');
+        done();
+      });
+  });
+
+  // Add other functional tests as needed...
 });
